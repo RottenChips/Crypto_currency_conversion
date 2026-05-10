@@ -39,11 +39,11 @@ from keyboards import (
 logger = logging.getLogger(__name__)
 router = Router()
 
+# ── Константи ────────────────────────────────────────────────────────────────
+
+MAIN_MENU_MESSAGE = "⬇️ Головне меню"
 
 # ── FSM-стани ───────────────────────────────────────────────────────────────
-
-
-
 
 class ConvertState(StatesGroup):
     """Стани процесу конвертації."""
@@ -134,7 +134,7 @@ async def show_rates(message: Message, state: FSMContext) -> None:
                 lines.append(f"   {label}: {rate:.4f}")
 
     await wait_msg.edit_text("\n".join(lines))
-    await message.answer("⬇️ Головне меню", reply_markup=main_menu_kb())
+    await message.answer(MAIN_MENU_MESSAGE, reply_markup=main_menu_kb())
 
 
 # ── Початок конвертації ─────────────────────────────────────────────────────
@@ -245,21 +245,21 @@ async def process_to_currency(message: Message, state: FSMContext) -> None:
             "⏰ Час очікування вичерпано. CoinGecko API не відповідає.\n"
             "Спробуйте пізніше."
         )
-        await message.answer("⬇️ Головне меню", reply_markup=main_menu_kb())
+        await message.answer(MAIN_MENU_MESSAGE, reply_markup=main_menu_kb())
         return
     except Exception:
         logger.exception("Помилка конвертації: %f %s -> %s", amount, from_currency, to_currency)
         await wait_msg.edit_text(
             "❌ Не вдалося отримати курси для конвертації. Спробуйте пізніше."
         )
-        await message.answer("⬇️ Головне меню", reply_markup=main_menu_kb())
+        await message.answer(MAIN_MENU_MESSAGE, reply_markup=main_menu_kb())
         return
 
     if result is None:
         await wait_msg.edit_text(
             "❌ Не вдалося знайти курс для цієї пари валют."
         )
-        await message.answer("⬇️ Головне меню", reply_markup=main_menu_kb())
+        await message.answer(MAIN_MENU_MESSAGE, reply_markup=main_menu_kb())
         return
 
     from_emoji = _currency_emoji(from_currency)
@@ -281,7 +281,7 @@ async def process_to_currency(message: Message, state: FSMContext) -> None:
             wait_msg.edit_text(final_text),
             timeout=12,
         )
-        await message.answer("⬇️ Головне меню", reply_markup=main_menu_kb())
+        await message.answer(MAIN_MENU_MESSAGE, reply_markup=main_menu_kb())
         logger.info("Готово: результат відправлено за %.2fs", time.monotonic() - started_at)
     except asyncio.TimeoutError:
         logger.error(
